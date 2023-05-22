@@ -1,36 +1,35 @@
 import streamlit as st
 import requests
 
-# Streamlit app title
-st.title("ChatGPT API Demo")
+# Define the API endpoint for ChatGPT
+API_ENDPOINT = 'https://api.openai.com/v1/chat/completions'
 
-# ChatGPT API endpoint
-api_endpoint = "https://api.openai.com/v1/chat/completions"
+# Set your OpenAI API key
+API_KEY = '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'
 
-# OpenAI API key
-api_key = "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"
-
-# User input text field
-user_input = st.text_input("Enter your message:")
-
-# Send user input to the ChatGPT API
-if user_input:
+# Helper function to send a chat request to ChatGPT API
+def send_chat_request(message):
     headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}"
+        'Authorization': 'Bearer ' + API_KEY,
+        'Content-Type': 'application/json'
     }
     payload = {
-        "model": "gpt-3.5-turbo",
-        "messages": [{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": user_input}]
+        'messages': [{'role': 'system', 'content': 'user'}, {'role': 'user', 'content': message}]
     }
+    response = requests.post(API_ENDPOINT, json=payload, headers=headers)
+    return response.json()
 
-    response = requests.post(api_endpoint, json=payload, headers=headers)
-    if response.status_code == 200:
-        data = response.json()
-        chat_response = data["choices"][0]["message"]["content"]
+# Streamlit app code
+def main():
+    st.title("ChatGPT Streamlit App")
+    st.write("Enter your message below:")
 
-        # Display the response from ChatGPT
-        st.text_area("ChatGPT:", value=chat_response, height=200)
+    user_input = st.text_input("User Input")
 
-# Instructions for the user
-st.text("Enter a message, and the assistant will respond.")
+    if st.button("Send"):
+        response = send_chat_request(user_input)
+        messages = response['choices'][0]['message']['content']
+        st.write("ChatGPT:", messages)
+
+if __name__ == "__main__":
+    main()
