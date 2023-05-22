@@ -6,7 +6,7 @@ API_URL = "https://api.openai.com/v1/chat/completions"
 def get_chat_response(message):
     headers = {
         "Content-Type": "application/json",
-        "Authorization": "Bearer YOUR_API_KEY"
+        "Authorization": "Bearer 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"
     }
 
     data = {
