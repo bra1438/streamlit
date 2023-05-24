@@ -5,14 +5,15 @@ def ta3reeb(word):
     ta3reeb_word = araby.tokenize(word)[0]
     return ta3reeb_word
 
-# تكوين واجهة المستخدم باستخدام Streamlit
-st.title("تعريب الكلمة")
+# إعداد واجهة المستخدم باستخدام Streamlit
+st.title("تعريب جملة عربية")
+sentence = st.text_input("أدخل الجملة:")
 
-word = st.text_input("أدخل الكلمة:")
 if st.button("تعريب"):
-    if word:
+    words = sentence.split()
+    ta3reeb_sentence = []
+    for word in words:
         ta3reeb_word = ta3reeb(word)
-        st.success(f"الكلمة المعربة: {ta3reeb_word}")
-    else:
-        st.warning("الرجاء إدخال كلمة.")
-
+        ta3reeb_sentence.append(ta3reeb_word)
+    ta3reeb_text = " ".join(ta3reeb_sentence)
+    st.write("الجملة المعربة:", ta3reeb_text)
