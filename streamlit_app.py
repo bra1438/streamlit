@@ -1,34 +1,27 @@
 import streamlit as st
-from pyarabic.araby import strip_tashkeel, is_arabicrange
+import spacy
 
 def analyze_sentence(sentence):
-    words = sentence.split()
+    # تحميل النموذج اللغوي العربي من spaCy
+    nlp = spacy.load("xx_ent_wiki_sm")
+
+    # تحليل الجملة باستخدام spaCy
+    doc = nlp(sentence)
+
+    # استخراج المعلومات النحوية
     verb = None
     subject = None
     object = None
 
-    for word in words:
-        # التأكد من أن الكلمة تحتوي على حروف عربية فقط
-        if is_arabicrange(word):
-            # إزالة التشكيل من الكلمة
-            word_stripped = strip_tashkeel(word)
-            
-            # فحص إذا كانت الكلمة فعلاً
-            if word_stripped in verb_list:
-                verb = word
-            # فحص إذا كانت الكلمة فاعلاً
-            elif word_stripped in subject_list:
-                subject = word
-            # فحص إذا كانت الكلمة مفعولاً به
-            elif word_stripped in object_list:
-                object = word
+    for token in doc:
+        if token.pos_ == "VERB":
+            verb = token.text
+        elif token.dep_ == "nsubj":
+            subject = token.text
+        elif token.dep_ == "obj":
+            object = token.text
 
     return verb, subject, object
-
-# تحميل قوائم الأفعال والفواعل والمفاعيل
-verb_list = ["فعل1", "فعل2", "فعل3"]
-subject_list = ["فاعل1", "فاعل2", "فاعل3"]
-object_list = ["مفعول1", "مفعول2", "مفعول3"]
 
 # تكوين واجهة المستخدم باستخدام Streamlit
 def main():
