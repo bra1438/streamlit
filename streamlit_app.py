@@ -1,37 +1,38 @@
 import streamlit as st
-from pyarabic.araby import tokenize
+import pyarabic.araby as araby
+import stanza
 
-def analyze_sentence(sentence):
-    # تقسيم الجملة إلى كلمات باستخدام pyarabic
-    words = tokenize(sentence)
+def analyze_word(word):
+    # تحميل نموذج اللغة العربية من stanza
+    stanza.download('ar')
+    nlp = stanza.Pipeline('ar')
 
-    # البحث عن الفعل والفاعل والمفعول به
-    verb = None
-    subject = None
-    object = None
+    # تحويل الكلمة إلى شكل معرب
+    arabic_word = araby.tokenize(word)[0]
 
-    for i in range(len(words)):
-        word = words[i]
-        if word.startswith("فعل"):
-            verb = word[3:]
-            # البحث عن الفاعل والمفعول به إذا كانا موجودين
-            if i > 0 and words[i-1].startswith("فاعل"):
-                subject = words[i-1][4:]
-            if i < len(words)-1 and words[i+1].startswith("مفعول"):
-                object = words[i+1][5:]
+    # تحليل الاعراب باستخدام stanza
+    doc = nlp(arabic_word)
+    sentence = doc.sentences[0]
+    words = sentence.words
 
-    return verb, subject, object
+    # استخراج الاعراب للكلمة
+    for word_info in words:
+        if word_info.text == arabic_word:
+            return word_info.xpos
+
+    return None
 
 # تكوين واجهة المستخدم باستخدام Streamlit
 def main():
-    st.title("تحليل الجملة العربية")
-    sentence = st.text_input("أدخل الجملة:")
+    st.title("تحليل اعراب الكلمات العربية")
+    word = st.text_input("أدخل الكلمة:")
 
-    if sentence:
-        verb, subject, object = analyze_sentence(sentence)
-        st.write("الفعل:", verb)
-        st.write("الفاعل:", subject)
-        st.write("المفعول به:", object)
+    if word:
+        analysis = analyze_word(word)
+        if analysis:
+            st.write("اعراب الكلمة:", analysis)
+        else:
+            st.write("تعذر تحليل الكلمة")
 
 if __name__ == "__main__":
     main()
