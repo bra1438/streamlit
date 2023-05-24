@@ -1,24 +1,20 @@
 import streamlit as st
-from pyarabic import araby
+import spacy
 
 def analyze_sentence(sentence):
-    # تجهيز الجملة وتحليلها
-    normalized_sentence = araby.strip_tashkeel(sentence)
-    words = araby.tokenize(normalized_sentence)
+    # تحميل النموذج اللغوي العربي من spaCy
+    nlp = spacy.load("xx_ent_wiki_sm")
 
-    # استخراج الفعل والفاعل
-    verb = None
-    subject = None
+    # تحليل الجملة باستخدام spaCy
+    doc = nlp(sentence)
 
-    for i in range(len(words)):
-        word = words[i]
-        if araby.is_verb(word):
-            verb = word
-            if i > 0 and araby.is_noun(words[i - 1]):
-                subject = words[i - 1]
-            break
+    # استخراج التعابير النحوية
+    word_grammatical_case = {}
 
-    return verb, subject
+    for token in doc:
+        word_grammatical_case[token.text] = token._.morph.get("Case")
+
+    return word_grammatical_case
 
 # تكوين واجهة المستخدم باستخدام Streamlit
 def main():
@@ -26,9 +22,11 @@ def main():
     sentence = st.text_input("أدخل الجملة:")
 
     if sentence:
-        verb, subject = analyze_sentence(sentence)
-        st.write("الفعل:", verb)
-        st.write("الفاعل:", subject)
+        word_grammatical_case = analyze_sentence(sentence)
+        for word, grammatical_case in word_grammatical_case.items():
+            st.write("الكلمة:", word)
+            st.write("إعراب الكلمة:", grammatical_case)
+            st.write("---")
 
 if __name__ == "__main__":
     main()
