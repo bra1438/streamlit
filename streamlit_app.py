@@ -1,5 +1,12 @@
 import streamlit as st
 import spacy
+from pyarabic.araby import vocalized
+
+
+def ta3reeb(word):
+    # تعريب الكلمة باستخدام pyarabic
+    return vocalized(word)
+
 
 def analyze_sentence(sentence):
     # تحميل النموذج اللغوي العربي من spaCy
@@ -15,13 +22,14 @@ def analyze_sentence(sentence):
 
     for token in doc:
         if token.pos_ == "VERB":
-            verb = token.text
+            verb = ta3reeb(token.text)
         elif token.dep_ == "nsubj":
-            subject = token.text
+            subject = ta3reeb(token.text)
         elif token.dep_ == "obj":
-            object = token.text
+            object = ta3reeb(token.text)
 
     return verb, subject, object
+
 
 # تكوين واجهة المستخدم باستخدام Streamlit
 def main():
@@ -33,6 +41,7 @@ def main():
         st.write("الفعل:", verb)
         st.write("الفاعل:", subject)
         st.write("المفعول به:", object)
+
 
 if __name__ == "__main__":
     main()
