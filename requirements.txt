@@ -1,6 +1,7 @@
 streamlit
 pyarabic
 nltk
+WordNet-Arabic
 stanza
 spacy
 streamlit_chat
