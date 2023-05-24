@@ -2,31 +2,33 @@ import streamlit as st
 import spacy
 
 def analyze_sentence(sentence):
-    # تحميل النموذج اللغوي العربي من spaCy
+    # Load the Arabic language model from spaCy
     nlp = spacy.load("xx_ent_wiki_sm")
 
-    # تحليل الجملة باستخدام spaCy
+    # Analyze the sentence using spaCy
     doc = nlp(sentence)
 
-    # استخراج التعابير النحوية
-    word_grammatical_case = {}
+    # Extract grammatical information
+    verb = None
+    subject = None
 
     for token in doc:
-        word_grammatical_case[token.text] = token._.morph.get("Case")
+        if token.pos_ == "VERB":
+            verb = token.text
+        elif token.dep_ == "nsubj":
+            subject = token.text
 
-    return word_grammatical_case
+    return verb, subject
 
-# تكوين واجهة المستخدم باستخدام Streamlit
+# Configure the user interface using Streamlit
 def main():
-    st.title("تحليل الجملة العربية")
-    sentence = st.text_input("أدخل الجملة:")
+    st.title("Arabic Sentence Analysis")
+    sentence = st.text_input("Enter the sentence:")
 
     if sentence:
-        word_grammatical_case = analyze_sentence(sentence)
-        for word, grammatical_case in word_grammatical_case.items():
-            st.write("الكلمة:", word)
-            st.write("إعراب الكلمة:", grammatical_case)
-            st.write("---")
+        verb, subject = analyze_sentence(sentence)
+        st.write("Verb:", verb)
+        st.write("Subject:", subject)
 
 if __name__ == "__main__":
     main()
