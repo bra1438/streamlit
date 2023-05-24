@@ -1,35 +1,37 @@
 import streamlit as st
-import spacy
-from pyarabic.araby import vocalized
-
-
-def ta3reeb(word):
-    # تعريب الكلمة باستخدام pyarabic
-    return vocalized(word)
-
+from pyarabic.araby import strip_tashkeel
+from WordNetArabic.WordNet import ArabicWordNet
 
 def analyze_sentence(sentence):
-    # تحميل النموذج اللغوي العربي من spaCy
-    nlp = spacy.load("xx_ent_wiki_sm")
+    # تنظيف الجملة من التشكيل
+    sentence = strip_tashkeel(sentence)
 
-    # تحليل الجملة باستخدام spaCy
-    doc = nlp(sentence)
+    # تحميل قاموس المعاني العربي
+    wordnet = ArabicWordNet()
 
     # استخراج المعلومات النحوية
     verb = None
     subject = None
     object = None
 
-    for token in doc:
-        if token.pos_ == "VERB":
-            verb = ta3reeb(token.text)
-        elif token.dep_ == "nsubj":
-            subject = ta3reeb(token.text)
-        elif token.dep_ == "obj":
-            object = ta3reeb(token.text)
+    # تحليل الجملة إلى كلمات
+    words = sentence.split()
+
+    # العثور على الفعل
+    for word in words:
+        if wordnet.is_verb(word):
+            verb = word
+            break
+
+    # العثور على الفاعل والمفعول به
+    for word in words:
+        if wordnet.is_noun(word):
+            if verb and wordnet.is_subject(verb, word):
+                subject = word
+            elif verb and wordnet.is_object(verb, word):
+                object = word
 
     return verb, subject, object
-
 
 # تكوين واجهة المستخدم باستخدام Streamlit
 def main():
@@ -41,7 +43,6 @@ def main():
         st.write("الفعل:", verb)
         st.write("الفاعل:", subject)
         st.write("المفعول به:", object)
-
 
 if __name__ == "__main__":
     main()
