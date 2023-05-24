@@ -1,5 +1,6 @@
 streamlit
 pyarabic
+spacy
 streamlit_chat
 openai
 python-dotenv
