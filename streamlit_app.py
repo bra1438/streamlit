@@ -1,34 +1,38 @@
 import streamlit as st
-from pyarabic.araby import Tokenizer, is_arabicrange
+import spacy
 
-def extract_verb_subject(sentence):
-    tokenizer = Tokenizer()
+def analyze_sentence(sentence):
+    # تحميل النموذج اللغوي العربي من spaCy
+    nlp = spacy.load("xx_ent_wiki_sm")
 
-    # تقسيم الجملة إلى كلمات منفردة
-    words = tokenizer.tokenize(sentence)
+    # تحليل الجملة باستخدام spaCy
+    doc = nlp(sentence)
 
+    # استخراج المعلومات النحوية
     verb = None
     subject = None
+    object = None
 
-    # استخراج الفعل والفاعل
-    for i in range(len(words)):
-        if is_arabicrange(words[i]):
-            if i+1 < len(words) and words[i+1] == 'من':
-                subject = words[i]
-            else:
-                verb = words[i]
-    
-    return verb, subject
+    for token in doc:
+        if token.pos_ == "VERB":
+            verb = token.text
+        elif token.dep_ == "nsubj":
+            subject = token.text
+        elif token.dep_ == "obj":
+            object = token.text
+
+    return verb, subject, object
 
 # تكوين واجهة المستخدم باستخدام Streamlit
 def main():
-    st.title("استخراج الفعل والفاعل")
+    st.title("تحليل الجملة العربية")
     sentence = st.text_input("أدخل الجملة:")
 
     if sentence:
-        verb, subject = extract_verb_subject(sentence)
+        verb, subject, object = analyze_sentence(sentence)
         st.write("الفعل:", verb)
         st.write("الفاعل:", subject)
+        st.write("المفعول به:", object)
 
 if __name__ == "__main__":
     main()
