@@ -1,20 +1,22 @@
 import streamlit as st
-from pyarabic.araby import tokenize, strip_tashkeel
+from pyarabic import araby
 
 def analyze_sentence(sentence):
-    # تقسيم الجملة إلى كلمات
-    words = tokenize(sentence)
+    # تجهيز الجملة وتحليلها
+    normalized_sentence = araby.strip_tashkeel(sentence)
+    words = araby.tokenize(normalized_sentence)
 
-    # استخراج الفعل والفاعل من الجملة
+    # استخراج الفعل والفاعل
     verb = None
     subject = None
 
-    for word in words:
-        word = strip_tashkeel(word)  # إزالة التشكيل
-        if word.endswith("ت"):
+    for i in range(len(words)):
+        word = words[i]
+        if araby.is_verb(word):
             verb = word
-        elif word.endswith("ى") or word.endswith("ي"):
-            subject = word
+            if i > 0 and araby.is_noun(words[i - 1]):
+                subject = words[i - 1]
+            break
 
     return verb, subject
 
