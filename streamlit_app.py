@@ -1,27 +1,22 @@
 import streamlit as st
-import spacy
+from pyarabic.araby import tokenize
+from pyarabic.named import *
 
 def analyze_sentence(sentence):
-    # تحميل النموذج اللغوي العربي من spaCy
-    nlp = spacy.load("xx_ent_wiki_sm")
+    # تقسيم الجملة إلى كلمات
+    words = tokenize(sentence)
 
-    # تحليل الجملة باستخدام spaCy
-    doc = nlp(sentence)
-
-    # استخراج المعلومات النحوية
+    # البحث عن الفعل والفاعل في الجملة
     verb = None
     subject = None
-    object = None
 
-    for token in doc:
-        if token.pos_ == "VERB":
-            verb = token.text
-        elif token.dep_ == "nsubj":
-            subject = token.text
-        elif token.dep_ == "obj":
-            object = token.text
+    for word in words:
+        if is_verb(word):
+            verb = word
+        elif is_named_entity(word):
+            subject = word
 
-    return verb, subject, object
+    return verb, subject
 
 # تكوين واجهة المستخدم باستخدام Streamlit
 def main():
@@ -29,10 +24,9 @@ def main():
     sentence = st.text_input("أدخل الجملة:")
 
     if sentence:
-        verb, subject, object = analyze_sentence(sentence)
+        verb, subject = analyze_sentence(sentence)
         st.write("الفعل:", verb)
         st.write("الفاعل:", subject)
-        st.write("المفعول به:", object)
 
 if __name__ == "__main__":
     main()
