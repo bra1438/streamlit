@@ -2,20 +2,19 @@ import streamlit as st
 import pyarabic.araby as araby
 
 def analyze_sentence(sentence):
-
-
-    # تفكيك الجملة إلى كلمات
+    # تحليل الجملة لاستخراج الفعل والفاعل
     words = araby.tokenize(sentence)
+    verb = None
+    subject = None
 
-    # البحث عن الفعل والفاعل
     for i in range(len(words)):
         if araby.is_arabicrange(words[i]):
-            # التأكد من أن الكلمة الحالية هي فعل
-            if araby.strip_tashkeel(words[i]) in ['فعل', 'مضارع', 'أمر', 'ماضي']:
+            if araby.vocalized_verb(words[i]):
                 verb = words[i]
-                # التأكد من أن الكلمة التالية هي فاعل
-                if i+1 < len(words) and araby.is_arabicrange(words[i+1]):
-                    subject = words[i+1]
+                if i > 0 and araby.is_arabicrange(words[i-1]):
+                    subject = words[i-1]
+                elif i > 1 and araby.is_arabicrange(words[i-2]):
+                    subject = words[i-2]
                 break
 
     return verb, subject
