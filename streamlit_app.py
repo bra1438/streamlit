@@ -1,40 +1,34 @@
 import streamlit as st
 import spacy
 
-def analyze_sentence(sentence):
+def extract_verb_subject(sentence):
     # تحميل النموذج اللغوي العربي من spaCy
     nlp = spacy.load("xx_ent_wiki_sm")
 
     # تحليل الجملة باستخدام spaCy
     doc = nlp(sentence)
 
-    # استخراج المعلومات النحوية
-    sentence_analysis = []
+    # استخراج الفعل والفاعل
+    verb = None
+    subject = None
 
     for token in doc:
-        token_info = {
-            "الكلمة": token.text,
-            "التصنيف النحوي": token.pos_,
-            "الوظيفة النحوية": token.dep_,
-            "التفاصيل الإضافية": token.tag_
-        }
-        sentence_analysis.append(token_info)
+        if token.pos_ == "VERB":
+            verb = token.text
+        elif token.dep_ == "nsubj":
+            subject = token.text
 
-    return sentence_analysis
+    return verb, subject
 
 # تكوين واجهة المستخدم باستخدام Streamlit
 def main():
-    st.title("تحليل الجملة العربية")
+    st.title("استخراج الفعل والفاعل")
     sentence = st.text_input("أدخل الجملة:")
 
     if sentence:
-        sentence_analysis = analyze_sentence(sentence)
-        for token_info in sentence_analysis:
-            st.write("---")
-            st.write("الكلمة:", token_info["الكلمة"])
-            st.write("التصنيف النحوي:", token_info["التصنيف النحوي"])
-            st.write("الوظيفة النحوية:", token_info["الوظيفة النحوية"])
-            st.write("التفاصيل الإضافية:", token_info["التفاصيل الإضافية"])
+        verb, subject = extract_verb_subject(sentence)
+        st.write("الفعل:", verb)
+        st.write("الفاعل:", subject)
 
 if __name__ == "__main__":
     main()
