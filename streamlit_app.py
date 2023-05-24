@@ -2,8 +2,7 @@ import streamlit as st
 import pyarabic.araby as araby
 
 def analyze_sentence(sentence):
-    verb = None
-    subject = None
+
 
     # تفكيك الجملة إلى كلمات
     words = araby.tokenize(sentence)
