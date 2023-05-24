@@ -1,34 +1,30 @@
 import streamlit as st
-import spacy
+from pyarabic.araby import morphological_analysis
 
-def analyze_sentence(sentence):
-    # Load the Arabic language model from spaCy
-    nlp = spacy.load("xx_ent_wiki_sm")
-
-    # Analyze the sentence using spaCy
-    doc = nlp(sentence)
-
-    # Extract grammatical information
+def analyze_verb_subject(sentence):
+    # استخراج الفعل والفاعل باستخدام PyArabic
+    analysis = morphological_analysis(sentence)
+    
     verb = None
     subject = None
 
-    for token in doc:
-        if token.pos_ == "VERB":
-            verb = token.text
-        elif token.dep_ == "nsubj":
-            subject = token.text
+    for word in analysis:
+        if 'فعل' in word['pos']:
+            verb = word['word']
+        elif 'اسم' in word['pos']:
+            subject = word['word']
 
     return verb, subject
 
-# Configure the user interface using Streamlit
+# تكوين واجهة المستخدم باستخدام Streamlit
 def main():
-    st.title("Arabic Sentence Analysis")
-    sentence = st.text_input("Enter the sentence:")
+    st.title("تحليل الفعل والفاعل العربي")
+    sentence = st.text_input("أدخل الجملة:")
 
     if sentence:
-        verb, subject = analyze_sentence(sentence)
-        st.write("Verb:", verb)
-        st.write("Subject:", subject)
+        verb, subject = analyze_verb_subject(sentence)
+        st.write("الفعل:", verb)
+        st.write("الفاعل:", subject)
 
 if __name__ == "__main__":
     main()
