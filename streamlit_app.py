@@ -1,33 +1,28 @@
 import streamlit as st
-import nltk
-from nltk.corpus import arabic
-
-nltk.download("arabic")
+from pyarabic.araby import strip_tashkeel
+import stanza
 
 def analyze_sentence(sentence):
-    # قائمة بأدوات التعريف في اللغة العربية
-    definite_articles = ["ال", "لل"]
+    # تحميل نموذج تحليل الجمل العربية من مكتبة stanza
+    stanza.download("ar")
+    nlp = stanza.Pipeline(lang='ar', processors='tokenize, pos')
 
-    # تحويل الجملة إلى قائمة من الكلمات
-    words = sentence.split()
+    # تحليل الجملة
+    doc = nlp(sentence)
 
-    # استخراج الفعل
+    # استخراج المعلومات النحوية
     verb = None
-    for word in words:
-        if word in arabic.verbs.words():
-            verb = word
-            break
-
-    # استخراج الفاعل والمفعول به
     subject = None
     object = None
-    for i in range(len(words)):
-        if words[i] == verb:
-            if i > 0 and words[i-1] not in definite_articles:
-                subject = words[i-1]
-            if i < len(words)-1 and words[i+1] not in definite_articles:
-                object = words[i+1]
-            break
+
+    for sentence in doc.sentences:
+        for word in sentence.words:
+            if word.upos == 'VERB':
+                verb = strip_tashkeel(word.text)
+            elif word.deprel == 'nsubj':
+                subject = strip_tashkeel(word.text)
+            elif word.deprel == 'obj':
+                object = strip_tashkeel(word.text)
 
     return verb, subject, object
 
