@@ -1,33 +1,46 @@
 import streamlit as st
 import nltk
+from nltk.corpus import arabic
 
-# تحميل مكونات NLTK اللازمة
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
+nltk.download("arabic")
 
 def analyze_sentence(sentence):
-    tokens = nltk.word_tokenize(sentence)  # تقسيم الجملة إلى كلمات
-    tagged_tokens = nltk.pos_tag(tokens)  # تحديد أنواع الكلمات (Parts-of-Speech)
+    # قائمة بأدوات التعريف في اللغة العربية
+    definite_articles = ["ال", "لل"]
 
-    verb = ''
-    subject = ''
-    object = ''
+    # تحويل الجملة إلى قائمة من الكلمات
+    words = sentence.split()
 
-    for token in tagged_tokens:
-        if token[1].startswith('V'):  # التحقق مما إذا كانت الكلمة فعلاً
-            verb = token[0]
-        elif token[1] == 'NNP':  # التحقق مما إذا كانت الكلمة اسماً مفرداً محدداً (الفاعل)
-            subject = token[0]
-        elif token[1].startswith('N'):  # التحقق مما إذا كانت الكلمة اسماً عاماً (المفعول به)
-            object = token[0]
+    # استخراج الفعل
+    verb = None
+    for word in words:
+        if word in arabic.verbs.words():
+            verb = word
+            break
+
+    # استخراج الفاعل والمفعول به
+    subject = None
+    object = None
+    for i in range(len(words)):
+        if words[i] == verb:
+            if i > 0 and words[i-1] not in definite_articles:
+                subject = words[i-1]
+            if i < len(words)-1 and words[i+1] not in definite_articles:
+                object = words[i+1]
+            break
 
     return verb, subject, object
 
 # تكوين واجهة المستخدم باستخدام Streamlit
-st.title("تحليل الجمل")
-sentence = st.text_input("أدخل الجملة:")
-if sentence:
-    verb, subject, object = analyze_sentence(sentence)
-    st.write("الفعل:", verb)
-    st.write("الفاعل:", subject)
-    st.write("المفعول به:", object)
+def main():
+    st.title("تحليل الجملة العربية")
+    sentence = st.text_input("أدخل الجملة:")
+
+    if sentence:
+        verb, subject, object = analyze_sentence(sentence)
+        st.write("الفعل:", verb)
+        st.write("الفاعل:", subject)
+        st.write("المفعول به:", object)
+
+if __name__ == "__main__":
+    main()
