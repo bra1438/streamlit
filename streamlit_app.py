@@ -1,45 +1,36 @@
 import streamlit as st
-from pyarabic.araby import strip_tashkeel
-from WordNetArabic.WordNet import ArabicWordNet
+import spacy
 
 def analyze_sentence(sentence):
-    # تنظيف الجملة من التشكيل
-    sentence = strip_tashkeel(sentence)
+    # تحميل النموذج اللغوي العربي من spaCy
+    nlp = spacy.load("xx_ent_wiki_sm")
 
-    # تحميل قاموس المعاني العربي
-    wordnet = ArabicWordNet()
+    # تحليل الجملة باستخدام spaCy
+    doc = nlp(sentence)
 
     # استخراج المعلومات النحوية
     verb = None
     subject = None
     object = None
 
-    # تحليل الجملة إلى كلمات
-    words = sentence.split()
-
-    # العثور على الفعل
-    for word in words:
-        if wordnet.is_verb(word):
-            verb = word
-            break
-
-    # العثور على الفاعل والمفعول به
-    for word in words:
-        if wordnet.is_noun(word):
-            if verb and wordnet.is_subject(verb, word):
-                subject = word
-            elif verb and wordnet.is_object(verb, word):
-                object = word
+    for token in doc:
+        if token.pos_ == "VERB":
+            verb = token.text
+        elif token.dep_ == "nsubj":
+            subject = token.text
+        elif token.dep_ == "obj":
+            object = token.text
 
     return verb, subject, object
 
 # تكوين واجهة المستخدم باستخدام Streamlit
 def main():
-    st.title("تحليل الجملة العربية")
+    st.title("تحليل الاعراب للجملة العربية")
     sentence = st.text_input("أدخل الجملة:")
 
     if sentence:
         verb, subject, object = analyze_sentence(sentence)
+        st.write("الجملة:", sentence)
         st.write("الفعل:", verb)
         st.write("الفاعل:", subject)
         st.write("المفعول به:", object)
