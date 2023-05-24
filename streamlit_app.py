@@ -1,47 +1,18 @@
 import streamlit as st
-from streamlit_chat import message
-from utils import get_initial_message, get_chatgpt_response, update_chat
-import os
-from dotenv import load_dotenv
-load_dotenv()
-import openai
+import pyarabic.araby as araby
 
-openai.api_key = os.getenv('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')
+def ta3reeb(word):
+    ta3reeb_word = araby.tokenize(word)[0]
+    return ta3reeb_word
 
-st.title("Chatbot : ChatGPT and Streamlit Chat")
-st.subheader("AI Tutor:")
+# تكوين واجهة المستخدم باستخدام Streamlit
+st.title("تعريب الكلمة")
 
-model = st.selectbox(
-    "Select a model",
-    ("gpt-3.5-turbo", "gpt-4")
-)
+word = st.text_input("أدخل الكلمة:")
+if st.button("تعريب"):
+    if word:
+        ta3reeb_word = ta3reeb(word)
+        st.success(f"الكلمة المعربة: {ta3reeb_word}")
+    else:
+        st.warning("الرجاء إدخال كلمة.")
 
-if 'generated' not in st.session_state:
-    st.session_state['generated'] = []
-if 'past' not in st.session_state:
-    st.session_state['past'] = []
-
-query = st.text_input("Query: ", key="input")
-
-if 'messages' not in st.session_state:
-    st.session_state['messages'] = get_initial_message()
- 
-if query:
-    with st.spinner("generating..."):
-        messages = st.session_state['messages']
-        messages = update_chat(messages, "user", query)
-        # st.write("Before  making the API call")
-        # st.write(messages)
-        response = get_chatgpt_response(messages,model)
-        messages = update_chat(messages, "assistant", response)
-        st.session_state.past.append(query)
-        st.session_state.generated.append(response)
-        
-if st.session_state['generated']:
-
-    for i in range(len(st.session_state['generated'])-1, -1, -1):
-        message(st.session_state['past'][i], is_user=True, key=str(i) + '_user')
-        message(st.session_state["generated"][i], key=str(i))
-
-    with st.expander("Show Messages"):
-        st.write(messages)
