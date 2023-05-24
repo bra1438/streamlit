@@ -1,6 +1,7 @@
 streamlit
 pyarabic
 nltk
+stanza
 spacy
 streamlit_chat
 openai
