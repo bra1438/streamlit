@@ -1,38 +1,33 @@
 import streamlit as st
-import spacy
+import nltk
+
+# تحميل مكونات NLTK اللازمة
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
 
 def analyze_sentence(sentence):
-    # تحميل النموذج اللغوي العربي من spaCy
-    nlp = spacy.load("xx_ent_wiki_sm")
+    tokens = nltk.word_tokenize(sentence)  # تقسيم الجملة إلى كلمات
+    tagged_tokens = nltk.pos_tag(tokens)  # تحديد أنواع الكلمات (Parts-of-Speech)
 
-    # تحليل الجملة باستخدام spaCy
-    doc = nlp(sentence)
+    verb = ''
+    subject = ''
+    object = ''
 
-    # استخراج المعلومات النحوية
-    verb = None
-    subject = None
-    object = None
-
-    for token in doc:
-        if token.pos_ == "VERB":
-            verb = token.text
-        elif token.dep_ == "nsubj":
-            subject = token.text
-        elif token.dep_ == "obj":
-            object = token.text
+    for token in tagged_tokens:
+        if token[1].startswith('V'):  # التحقق مما إذا كانت الكلمة فعلاً
+            verb = token[0]
+        elif token[1] == 'NNP':  # التحقق مما إذا كانت الكلمة اسماً مفرداً محدداً (الفاعل)
+            subject = token[0]
+        elif token[1].startswith('N'):  # التحقق مما إذا كانت الكلمة اسماً عاماً (المفعول به)
+            object = token[0]
 
     return verb, subject, object
 
 # تكوين واجهة المستخدم باستخدام Streamlit
-def main():
-    st.title("تحليل الجملة العربية")
-    sentence = st.text_input("أدخل الجملة:")
-
-    if sentence:
-        verb, subject, object = analyze_sentence(sentence)
-        st.write("الفعل:", verb)
-        st.write("الفاعل:", subject)
-        st.write("المفعول به:", object)
-
-if __name__ == "__main__":
-    main()
+st.title("تحليل الجمل")
+sentence = st.text_input("أدخل الجملة:")
+if sentence:
+    verb, subject, object = analyze_sentence(sentence)
+    st.write("الفعل:", verb)
+    st.write("الفاعل:", subject)
+    st.write("المفعول به:", object)
