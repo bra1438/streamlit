@@ -1,7 +1,7 @@
 import streamlit as st
 from pyarabic.araby import strip_tashkeel
 import stanza
-
+ 
 def analyze_sentence(sentence):
     # تحميل نموذج تحليل الجمل العربية من مكتبة stanza
     stanza.download("ar")
