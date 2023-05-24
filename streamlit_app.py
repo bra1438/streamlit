@@ -23,8 +23,8 @@ if st.button("تعريب"):
 
 
 
-def ta3reeb_sentence(sentence):
-    tokens = araby.tokenize(sentence)  # تقسيم الجملة إلى كلمات
+def ta3reeb_sentence(word):
+    tokens = araby.tokenize(word)  # تقسيم الجملة إلى كلمات
     ta3reeb_sentence = ""
 
     for token in tokens:
@@ -35,6 +35,6 @@ def ta3reeb_sentence(sentence):
 
 # استخدام السكربت
 sentence = input("أدخل الجملة: ")
-ta3reeb_sentence = ta3reeb_sentence(sentence)
+ta3reeb_sentence = ta3reeb_sentence(word)
 print("الجملة المعربة:", ta3reeb_sentence)
  st.write("الجملة المعربة:", ta3reeb_sentence)
