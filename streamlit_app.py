@@ -1,40 +1,33 @@
 import streamlit as st
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk.tag import pos_tag
+import pyarabic.arabrepr as arabrepr
+import pyarabic.araby as araby
+from pyarabic.named import *
 
-def extract_entities(sentence):
-    # Tokenize the sentence into individual words
-    words = word_tokenize(sentence)
+def find_verb_subject(sentence):
+    words = araby.tokenize(sentence)
 
-    # Perform Part-of-Speech (POS) tagging
-    tagged_words = pos_tag(words)
-
-    # Initialize variables for verb, subject, and object
     verb = None
     subject = None
-    object_ = None
 
-    for word, tag in tagged_words:
-        if tag.startswith('V'):  # Verb
+    for word in words:
+        root_word = strip_tashkeel(word)
+        analysis = arabrepr.ArabicRepresentations(root_word)
+
+        if analysis.is_verb():
             verb = word
-        elif tag.startswith('N'):  # Noun
-            if subject is None:
-                subject = word
-            else:
-                object_ = word
+        elif analysis.is_noun():
+            subject = word
 
-    return verb, subject, object_
+    return verb, subject
 
 def main():
-    st.title("Extraction of Verb, Subject, and Object in Arabic Sentence")
+    st.title("Finding Verb and Subject in Arabic Sentence")
     sentence = st.text_input("Enter an Arabic sentence:")
 
     if sentence:
-        verb, subject, object_ = extract_entities(sentence)
+        verb, subject = find_verb_subject(sentence)
         st.write("Verb:", verb)
         st.write("Subject:", subject)
-        st.write("Object:", object_)
 
 if __name__ == "__main__":
     main()
