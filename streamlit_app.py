@@ -1,28 +1,41 @@
+pip install streamlit
+pip install pyarabic
+
 import streamlit as st
 from pyarabic.araby import vocalized_word
 from pyarabic.araby import tokenize
 from pyarabic.araby import strip_tashkeel
-from pyarabic.araby import is_arabicrange
+from pyarabic.madina_corpus import MadinaCorpus
 
-def analyze_sentence(sentence):
+def find_verb_and_subject(sentence):
     tokens = tokenize(sentence)
-    analyzed_sentence = ""
+    madina_corpus = MadinaCorpus()
+    
+    verb = ""
+    subject = ""
+    
     for token in tokens:
         if is_arabicrange(token):
             token = strip_tashkeel(token)
             token = vocalized_word(token)
-        analyzed_sentence += token + " "
-    return analyzed_sentence.strip()
-
+            
+            if not verb and madina_corpus.is_verb(token):
+                verb = token
+            elif not subject and madina_corpus.is_noun(token):
+                subject = token
+    
+    return verb, subject
 
 def main():
-    st.title("تطبيق الإعراب")
+    st.title("تطبيق تحديد الفعل والفاعل")
 
     sentence = st.text_input("أدخل الجملة العربية:")
-    if st.button("إعراب"):
-        analyzed_sentence = analyze_sentence(sentence)
-        st.write("الجملة العربية المعربة:")
-        st.write(analyzed_sentence)
+    if st.button("تحديد"):
+        verb, subject = find_verb_and_subject(sentence)
+        st.write("الفعل:")
+        st.write(verb)
+        st.write("الفاعل:")
+        st.write(subject)
 
 if __name__ == "__main__":
     main()
