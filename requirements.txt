@@ -1,6 +1,7 @@
 streamlit
 pyarabic
 nltk
+arabicnlp
 stanza
 spacy
 streamlit_chat
