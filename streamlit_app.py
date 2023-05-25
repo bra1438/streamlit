@@ -3,7 +3,7 @@ import pyarabic.arabrepr as arabrepr
 import pyarabic.araby as araby
 from pyarabic.named import *
 from pyarabic.araby import strip_tashkeel
-from arabrepr import ArabicRepresentations
+
 
 def find_verb_subject(sentence):
     words = araby.tokenize(sentence)
