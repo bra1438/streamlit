@@ -1,30 +1,23 @@
 import streamlit as st
-import stanza
+import pyarabic.araby as araby
+from pyarabic.araby import tokenize as tokenize_arabic
+from pyarabic.araby import strip_tashkeel
 
 def pos_tag_arabic(text):
-    # Load the Arabic pre-trained POS tagger
-    nlp = stanza.Pipeline(lang='ar', processors='pos')
+    tokens = tokenize_arabic(strip_tashkeel(text))
+    pos_tags = araby.pos(tokens)
+    return list(zip(tokens, pos_tags))
 
-    # Process the text and perform POS tagging
-    doc = nlp(text)
-
-    pos_tags = []
-    for sentence in doc.sentences:
-        for word in sentence.words:
-            pos_tags.append((word.text, word.upos))
-
-    return pos_tags
-
-# Configure the Streamlit app
+# تكوين واجهة المستخدم باستخدام Streamlit
 def main():
-    st.title("Arabic Part-of-Speech Tagging")
-    text = st.text_area("Enter Arabic text:")
+    st.title("تحليل تصنيف الكلمات في العربية")
+    text = st.text_area("أدخل النص العربي:")
 
     if text:
         pos_tags = pos_tag_arabic(text)
-        for word, pos_tag in pos_tags:
-            st.write("Word:", word)
-            st.write("POS Tag:", pos_tag)
+        for token, pos in pos_tags:
+            st.write("الكلمة:", token)
+            st.write("تصنيف الكلمة:", pos)
             st.write("---")
 
 if __name__ == "__main__":
