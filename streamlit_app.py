@@ -1,30 +1,21 @@
 import streamlit as st
-import nltk
-from nltk.tag import tashaphyne
+from arabicnlp import ArabicPOS
 
-def pos_tag_arabic(text):
-    # تحميل قاموس الكلمات العربية
-    nltk.download("tashaphyne")
-    
-    # تقسيم النص إلى كلمات منفردة
-    words = nltk.word_tokenize(text)
-    
-    # إجراء POS tagging للنص العربي
-    pos_tags = tashaphyne.pos_tag(words)
-    
-    return pos_tags
+def tag_pos(text):
+    pos_tagger = ArabicPOS()
+    tagged_text = pos_tagger.tag(text)
+    return tagged_text
 
-# تكوين واجهة المستخدم باستخدام Streamlit
 def main():
-    st.title("تحديد أجزاء الكلام في النص العربي")
-    text = st.text_area("أدخل النص:")
-    
+    st.title("POS Tagging for Arabic Text")
+    text = st.text_input("Enter Arabic text:")
+
     if text:
-        pos_tags = pos_tag_arabic(text)
-        
-        st.write("نتائج تحديد أجزاء الكلام:")
-        for word, pos_tag in pos_tags:
-            st.write(f"{word}: {pos_tag}")
+        tagged_text = tag_pos(text)
+        for word, tag in tagged_text:
+            st.write("Word:", word)
+            st.write("POS Tag:", tag)
+            st.write("---")
 
 if __name__ == "__main__":
     main()
