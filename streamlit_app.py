@@ -1,24 +1,34 @@
 import streamlit as st
 import pyarabic.araby as araby
-from pyarabic.araby import tokenize as tokenize_arabic
-from pyarabic.araby import strip_tashkeel
 
-def pos_tag_arabic(text):
-    tokens = tokenize_arabic(strip_tashkeel(text))
-    pos_tags = araby.pos(tokens)
-    return list(zip(tokens, pos_tags))
+def analyze_sentence(sentence):
+    # تحليل الجملة إلى كلمات منفردة
+    words = araby.tokenize(sentence)
+
+    # استخراج إعراب الجملة
+    analysis = araby.guess_pos(words)
+
+    # استخراج الفعل والفاعل
+    verb = None
+    subject = None
+
+    for word, pos in analysis:
+        if pos == "verb":
+            verb = word
+        elif pos == "noun":
+            subject = word
+
+    return verb, subject
 
 # تكوين واجهة المستخدم باستخدام Streamlit
 def main():
-    st.title("تحليل تصنيف الكلمات في العربية")
-    text = st.text_area("أدخل النص العربي:")
+    st.title("تحليل الجملة العربية")
+    sentence = st.text_input("أدخل الجملة:")
 
-    if text:
-        pos_tags = pos_tag_arabic(text)
-        for token, pos in pos_tags:
-            st.write("الكلمة:", token)
-            st.write("تصنيف الكلمة:", pos)
-            st.write("---")
+    if sentence:
+        verb, subject = analyze_sentence(sentence)
+        st.write("الفعل:", verb)
+        st.write("الفاعل:", subject)
 
 if __name__ == "__main__":
     main()
