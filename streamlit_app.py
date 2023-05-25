@@ -2,7 +2,7 @@ import streamlit as st
 import openai
 
 # Set up OpenAI API credentials
-openai.api_key = 'YOUR_API_KEY'
+openai.api_key = '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'
 
 # Set up Streamlit layout
 st.title("Arabic Sentence Analysis")
