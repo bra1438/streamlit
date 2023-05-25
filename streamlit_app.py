@@ -1,31 +1,34 @@
 import streamlit as st
-from pyarabic.araby import is_arabicrange
-from pyarabic.araby import strip_tashkeel
-from pyarabic.araby import is_tashkeel
-from pyarabic.araby import simplify_tashkeel
-from pyarabic.araby import is_arabicletter
-from pyarabic.araby import is_arabicsymbol
+from pyarabic import araby
+from pyarabic.araby import tokenize, is_arabicrange, strip_tashkeel
+from pyarabic.arabrepr import ArabRepr
+from pyarabic.number import vocalize
 
-def arabic_syntax():
-    st.title("تحليل واعراب الجمل العربية")
+def analyze_sentence(sentence):
+    # تحليل النص
+    tokens = tokenize(sentence)
+    # إعراب الجملة
+    repr = ArabRepr()
+    analysis = []
+    for token in tokens:
+        # تحويل الأعداد إلى كلمات
+        if is_arabicrange(token):
+            token = vocalize(token)
+        # إزالة التشكيل
+        token = strip_tashkeel(token)
+        # الإعراب
+        arabic_word = araby.tokenize(token)
+        analysis.append((token, repr.repr(arabic_word[0])))
 
+    return analysis
+
+def main():
+    st.title("تحليل إعراب الجمل العربية")
     sentence = st.text_input("أدخل الجملة العربية:")
-
     if sentence:
-        # تقوم بتنظيف الجملة من الأشكال الزائدة
-        clean_sentence = strip_tashkeel(sentence)
+        analysis = analyze_sentence(sentence)
+        for word, analysis_result in analysis:
+            st.write(f"{word}: {analysis_result}")
 
-        # قم بعمل الاعراب على الجملة المنظفة هنا
-        # يمكنك استخدام أي مكتبة أو أداة لتنفيذ عملية الاعراب
-
-        # عرض النتائج
-        st.subheader("الجملة الأصلية:")
-        st.write(sentence)
-
-        st.subheader("الجملة المنظفة:")
-        st.write(clean_sentence)
-
-        st.subheader("النتائج:")
-        # عرض نتائج عملية الاعراب هنا
-
-arabic_syntax()
+if __name__ == "__main__":
+    main()
