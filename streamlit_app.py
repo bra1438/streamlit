@@ -1,6 +1,3 @@
-pip install streamlit
-pip install pyarabic
-
 import streamlit as st
 from pyarabic.araby import vocalized_word
 from pyarabic.araby import tokenize
