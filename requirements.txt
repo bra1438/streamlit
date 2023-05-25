@@ -5,6 +5,6 @@ stanza
 spacy
 streamlit_chat
 openai
-python-dotenv
-arabrepr
+
+
 
