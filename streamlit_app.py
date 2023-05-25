@@ -1,34 +1,25 @@
 import streamlit as st
 import pyarabic.araby as araby
 
-def analyze_sentence(sentence):
-    # تحليل الجملة إلى كلمات منفردة
+def parse_sentence(sentence):
     words = araby.tokenize(sentence)
+    analysis = []
 
-    # استخراج إعراب الجملة
-    analysis = araby.guess_pos(words)
+    for word in words:
+        if araby.is_arabicrange(word):
+            parsed_word = araby.strip_tashkeel(word)
+            analysis.append(f"{word}: {araby.tokenize(parsed_word)}")
 
-    # استخراج الفعل والفاعل
-    verb = None
-    subject = None
+    return analysis
 
-    for word, pos in analysis:
-        if pos == "verb":
-            verb = word
-        elif pos == "noun":
-            subject = word
-
-    return verb, subject
-
-# تكوين واجهة المستخدم باستخدام Streamlit
 def main():
-    st.title("تحليل الجملة العربية")
-    sentence = st.text_input("أدخل الجملة:")
+    st.title("Simple Arabic Sentence Parsing")
+    sentence = st.text_input("Enter an Arabic sentence:")
 
     if sentence:
-        verb, subject = analyze_sentence(sentence)
-        st.write("الفعل:", verb)
-        st.write("الفاعل:", subject)
+        analysis = parse_sentence(sentence)
+        for item in analysis:
+            st.write(item)
 
 if __name__ == "__main__":
     main()
