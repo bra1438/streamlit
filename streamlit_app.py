@@ -1,7 +1,5 @@
 import streamlit as st
-import pyarabic.arabrepr as arabrepr
 import pyarabic.araby as araby
-from pyarabic.araby import verbs as arabic_verbs
 
 def analyze_sentence(sentence):
     # تحليل الجملة إلى كلمات منفردة
@@ -13,10 +11,10 @@ def analyze_sentence(sentence):
 
     for word in words:
         # التحقق مما إذا كانت الكلمة فعلًا
-        if arabic_verbs.is_verb(word):
+        if araby.is_verb(word):
             verb = word
         # التحقق مما إذا كانت الكلمة فاعلًا
-        elif arabrepr.ArabicRepr().is_person(word):
+        elif araby.is_noun(word):
             subject = word
 
     return verb, subject
