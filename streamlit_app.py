@@ -1,6 +1,6 @@
 import streamlit as st
 import pyarabic.araby as araby
-import pyarabic.buckwalter as buckwalter
+import buckwalter
 
 def analyze_sentence(sentence):
     # تحليل الجملة إلى كلمات منفردة
