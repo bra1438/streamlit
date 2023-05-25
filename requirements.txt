@@ -2,7 +2,6 @@ streamlit
 pyarabic
 nltk
 stanza
-arabic-reshaper
 spacy
 streamlit_chat
 openai
