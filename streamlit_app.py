@@ -1,22 +1,25 @@
 import streamlit as st
 import pyarabic.araby as araby
-from pyarabic.named import *
+import pyarabic.buckwalter as buckwalter
 
 def analyze_sentence(sentence):
     # تحليل الجملة إلى كلمات منفردة
     words = araby.tokenize(sentence)
 
+    # إعادة ترميز الكلمات إلى ترميز بوكوالتر
+    buckwalter_words = [buckwalter.transliterate(word) for word in words]
+
     # استخراج الفعل والفاعل
     verb = None
     subject = None
 
-    for word in words:
+    for i, word in enumerate(buckwalter_words):
         # التحقق مما إذا كانت الكلمة فعلًا
-        if is_verb(word):
-            verb = word
+        if 'V' in word:
+            verb = words[i]
         # التحقق مما إذا كانت الكلمة فاعلًا
-        elif is_name(word):
-            subject = word
+        elif 'N' in word:
+            subject = words[i]
 
     return verb, subject
 
