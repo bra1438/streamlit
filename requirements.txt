@@ -7,3 +7,4 @@ streamlit_chat
 openai
 python-dotenv
 arabrepr
+transformers
