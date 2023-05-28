@@ -1,38 +1,41 @@
+import speech_recognition as sr
 import streamlit as st
-from pyarabic.araby import vocalized_word
-from pyarabic.araby import tokenize
-from pyarabic.araby import strip_tashkeel
-from pyarabic.madina_corpus import MadinaCorpus
 
-def find_verb_and_subject(sentence):
-    tokens = tokenize(sentence)
-    madina_corpus = MadinaCorpus()
+def speech_recognition():
+    # Create a recognizer object
+    r = sr.Recognizer()
     
-    verb = ""
-    subject = ""
-    
-    for token in tokens:
-        if is_arabicrange(token):
-            token = strip_tashkeel(token)
-            token = vocalized_word(token)
-            
-            if not verb and madina_corpus.is_verb(token):
-                verb = token
-            elif not subject and madina_corpus.is_noun(token):
-                subject = token
-    
-    return verb, subject
+    # Use the microphone as the audio source
+    with sr.Microphone() as source:
+        
+        # Adjust for ambient noise
+        r.adjust_for_ambient_noise(source, duration=1)
+        
+        # Prompt the user to say something
+        st.write("Say something!")
+        
+        # Listen for speech input
+        audio = r.listen(source)
+        
+    # Use Google's speech recognition API to transcribe the speech
+    try:
+        text = r.recognize_google(audio)
+        st.write("You said: ", text)
+        
+    except sr.UnknownValueError:
+        st.write("Sorry, I couldn't understand what you said.")
+        
+    except sr.RequestError as e:
+        st.write("Sorry, something went wrong with the speech recognition service.")
+        
+# Create a Streamlit application
+def app():
+    st.title("Speech Recognition")
 
-def main():
-    st.title("تطبيق تحديد الفعل والفاعل")
+    # Call the speech_recognition function on button click
+    if st.button("Speak"):
+        speech_recognition()
 
-    sentence = st.text_input("أدخل الجملة العربية:")
-    if st.button("تحديد"):
-        verb, subject = find_verb_and_subject(sentence)
-        st.write("الفعل:")
-        st.write(verb)
-        st.write("الفاعل:")
-        st.write(subject)
-
+# Run the Streamlit application
 if __name__ == "__main__":
-    main()
+    app()
