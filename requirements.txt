@@ -5,4 +5,3 @@ stanza
 spacy
 streamlit_chat
 openai
-speech_recognition
