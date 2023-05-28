@@ -1,31 +1,31 @@
 import streamlit as st
-
-# Dictionary of nutrition tips
-tips = {
-    "Tip 1": "Make half your plate fruits and vegetables for every meal.",
-    "Tip 2": "Choose whole grains instead of refined grains.",
-    "Tip 3": "Limit your intake of sugary drinks, such as soda and sports drinks.",
-    "Tip 4": "Choose lean protein sources, such as poultry and fish.",
-    "Tip 5": "Limit your intake of saturated fats and trans fats.",
-    "Tip 6": "Drink plenty of water throughout the day.",
-}
+from PIL import Image
 
 # Create a Streamlit application
 def app():
-    st.title("Nutrition Tips")
+    st.title("Image Merger")
     
-    # Display a random nutrition tip
-    rand_tip = st.button("Get Random Tip")
-    if rand_tip:
-        tip = random.choice(list(tips.values()))
-        st.success(tip)
+    # Select two images to merge
+    img1 = st.file_uploader("Choose the first image", type=["jpg", "jpeg", "png"])
+    img2 = st.file_uploader("Choose the second image", type=["jpg", "jpeg", "png"])
     
-    # Display all the nutrition tips
-    st.write("All Tips:")
-    for key, value in tips.items():
-        st.write(f"{key}: {value}")
+    # Merge the images and display the result
+    if img1 and img2:
+        # Load the images
+        image1 = Image.open(img1)
+        image2 = Image.open(img2)
         
-
+        # Resize the images to the same size
+        size = (min(image1.size[0], image2.size[0]), min(image1.size[1], image2.size[1]))
+        image1 = image1.resize(size)
+        image2 = image2.resize(size)
+        
+        # Merge the images
+        im_merge = Image.blend(image1, image2, alpha=0.5)
+        
+        # Display the merged image
+        st.image(im_merge, use_column_width=True)
+        
 # Run the Streamlit application
 if __name__ == "__main__":
     app()
